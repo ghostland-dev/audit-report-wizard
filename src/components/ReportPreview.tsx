@@ -1,9 +1,17 @@
 
-import { FileText, Download } from "lucide-react";
+import { FileText, Download, FileText2, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AuditData } from "@/components/AuditForm";
+import { downloadAsPDF, downloadAsWord } from "@/utils/reportGenerator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
 interface ReportPreviewProps {
   auditData?: Partial<AuditData>;
@@ -11,12 +19,46 @@ interface ReportPreviewProps {
 }
 
 const ReportPreview = ({ auditData, loading = false }: ReportPreviewProps) => {
+  const { toast } = useToast();
+  
   const hasData = auditData && (
     auditData.title || 
     auditData.client || 
     auditData.scope || 
     auditData.findings
   );
+
+  const handleExport = (format: 'pdf' | 'word') => {
+    if (!auditData) {
+      toast({
+        title: "Impossible d'exporter",
+        description: "Veuillez d'abord compléter les informations de l'audit.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (format === 'pdf') {
+      downloadAsPDF(auditData as AuditData);
+      toast({
+        title: "Rapport téléchargé",
+        description: "Le rapport a été téléchargé au format PDF (simulé)."
+      });
+    } else {
+      downloadAsWord(auditData as AuditData);
+      toast({
+        title: "Rapport téléchargé",
+        description: "Le rapport a été téléchargé au format Word (simulé)."
+      });
+    }
+  };
+  
+  const handleShare = () => {
+    toast({
+      title: "Fonctionnalité à venir",
+      description: "Le partage de rapports sera disponible dans une prochaine mise à jour."
+    });
+  };
 
   const renderContent = () => {
     if (loading) {
@@ -106,14 +148,38 @@ const ReportPreview = ({ auditData, loading = false }: ReportPreviewProps) => {
       <CardContent className="border-t border-b p-4 min-h-[300px] bg-gray-50 overflow-auto">
         {renderContent()}
       </CardContent>
-      <CardFooter className="p-4">
+      <CardFooter className="p-4 flex flex-col sm:flex-row gap-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              disabled={!hasData} 
+              variant="outline" 
+              className="w-full sm:w-auto gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Télécharger
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => handleExport('pdf')}>
+              <FileText className="h-4 w-4 mr-2" />
+              Exporter en PDF
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleExport('word')}>
+              <FileText2 className="h-4 w-4 mr-2" />
+              Exporter en Word
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        
         <Button 
           disabled={!hasData} 
-          variant="outline" 
-          className="w-full gap-2"
+          variant="ghost" 
+          onClick={handleShare}
+          className="w-full sm:w-auto gap-2"
         >
-          <Download className="h-4 w-4" />
-          Télécharger le rapport
+          <Share2 className="h-4 w-4" />
+          Partager
         </Button>
       </CardFooter>
     </Card>

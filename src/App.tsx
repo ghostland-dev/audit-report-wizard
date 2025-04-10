@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import CreateAudit from "./pages/CreateAudit";
 import AuditDetails from "./pages/AuditDetails";
 import EditAudit from "./pages/EditAudit";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/create-audit" element={<CreateAudit />} />
           <Route path="/audits/:id" element={<AuditDetails />} />
           <Route path="/audits/:id/edit" element={<EditAudit />} />
+          <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
