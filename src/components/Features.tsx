@@ -11,7 +11,7 @@ import {
 const features = [
   {
     name: 'Rapports automatisés',
-    description: 'Générez des rapports d'audit complets avec une structure professionnelle en quelques clics.',
+    description: 'Générez des rapports d\'audit complets avec une structure professionnelle en quelques clics.',
     icon: FileText,
   },
   {
