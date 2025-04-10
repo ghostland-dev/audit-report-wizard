@@ -364,12 +364,14 @@ export const generateShareableLink = (auditData: AuditData): string => {
  * This is useful for minimizing data size when sharing
  */
 export const sanitizeAuditData = (auditData: AuditData): Partial<AuditData> => {
-  const sanitized: Partial<AuditData> = {};
+  // Initialize sanitized as an explicit Partial<AuditData>
+  const sanitized = {} as Partial<AuditData>;
   
   Object.entries(auditData).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
-      // Use type assertion to let TypeScript know this is a valid key
-      sanitized[key as keyof AuditData] = value as any as AuditData[keyof AuditData];
+      // Explicitly cast both the key and value to their expected types
+      const typedKey = key as keyof AuditData;
+      sanitized[typedKey] = value as unknown as AuditData[typeof typedKey];
     }
   });
   
