@@ -1,77 +1,87 @@
 
-import { 
-  ClipboardList, 
-  FileText, 
-  Clock, 
-  Layout, 
-  Shield, 
-  LineChart 
-} from "lucide-react";
+import { Check, FileText, FileCog, ChartBar, Share2, LockKeyhole, Tag } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const features = [
   {
-    name: 'Rapports automatisés',
-    description: 'Générez des rapports d\'audit complets avec une structure professionnelle en quelques clics.',
     icon: FileText,
+    title: "Modèles personnalisables",
+    description: "Créez et personnalisez des modèles d'audit adaptés à vos besoins spécifiques."
   },
   {
-    name: 'Modèles personnalisables',
-    description: 'Adaptez la structure de vos rapports selon les besoins spécifiques de vos clients et projets.',
-    icon: ClipboardList,
+    icon: FileCog,
+    title: "Gestion des preuves",
+    description: "Organisez et stockez facilement les preuves recueillies lors de vos audits."
   },
   {
-    name: 'Gain de temps considérable',
-    description: 'Réduisez de 70% le temps consacré à la rédaction de vos rapports d\'audit.',
-    icon: Clock,
+    icon: ChartBar,
+    title: "Rapports détaillés",
+    description: "Générez des rapports professionnels avec graphiques et tableaux personnalisables."
   },
   {
-    name: 'Tableaux de bord visuels',
-    description: 'Visualisez les données d\'audit à travers des graphiques et indicateurs personnalisés.',
-    icon: LineChart,
+    icon: Share2,
+    title: "Collaboration d'équipe",
+    description: "Travaillez efficacement en équipe sur les mêmes projets d'audit en temps réel."
   },
   {
-    name: 'Exports multiformats',
-    description: 'Exportez vos rapports au format PDF ou Word pour un partage et une modification faciles.',
-    icon: Layout,
+    icon: LockKeyhole,
+    title: "Sécurité avancée",
+    description: "Vos données sont protégées avec un chiffrement de bout en bout et des contrôles d'accès."
   },
   {
-    name: 'Sécurité et confidentialité',
-    description: 'Vos données sont protégées par des systèmes de sécurité conformes aux normes RGPD.',
-    icon: Shield,
-  },
-]
+    icon: Tag,
+    title: "Analyse des coûts",
+    description: "Suivez et analysez les coûts de vos audits pour une meilleure rentabilité."
+  }
+];
 
 const Features = () => {
   return (
-    <div id="features" className="bg-white py-24 sm:py-32">
+    <section className="py-24 bg-gray-50">
       <div className="audit-container">
-        <div className="mx-auto max-w-2xl lg:text-center">
-          <h2 className="text-base font-semibold leading-7 text-audit-blue-600">Gagnez en productivité</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Tout ce dont vous avez besoin pour vos audits SI
-          </p>
-          <p className="mt-6 text-lg leading-8 text-gray-600">
-            Notre plateforme offre un ensemble complet d'outils pour simplifier et standardiser vos rapports 
-            d'audit de systèmes d'information, du recueil des données à la production du document final.
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl font-bold mb-4">Un outil complet pour les auditeurs professionnels</h2>
+          <p className="text-xl text-audit-gray-600">
+            Simplifiez vos processus d'audit avec notre plateforme tout-en-un.
           </p>
         </div>
-        <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-          <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-            {features.map((feature) => (
-              <div key={feature.name} className="card-hover flex flex-col rounded-xl bg-white p-6 shadow">
-                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
-                  <feature.icon className="h-6 w-6 flex-none text-audit-blue-600" aria-hidden="true" />
-                  {feature.name}
-                </dt>
-                <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
-                  <p className="flex-auto">{feature.description}</p>
-                </dd>
-              </div>
-            ))}
-          </dl>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <Card key={index} className="border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <CardHeader>
+                <div className="h-12 w-12 rounded-lg bg-audit-blue-100 flex items-center justify-center mb-4">
+                  <feature.icon className="h-6 w-6 text-audit-blue-600" />
+                </div>
+                <CardTitle className="text-xl">{feature.title}</CardTitle>
+                <CardDescription className="text-audit-gray-600">
+                  {feature.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {[1, 2, 3].map((item) => (
+                    <li key={item} className="flex items-start">
+                      <Check className="h-5 w-5 text-green-500 mr-2 shrink-0" />
+                      <span className="text-sm text-audit-gray-600">
+                        Fonctionnalité {feature.title.split(' ')[0]} {item}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="mt-16 text-center">
+          <Button className="bg-audit-blue-600 hover:bg-audit-blue-700 text-lg h-12 px-8">
+            Explorer toutes les fonctionnalités
+          </Button>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

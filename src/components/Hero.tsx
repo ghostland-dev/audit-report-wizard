@@ -1,58 +1,99 @@
 
-import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowRight, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
+  const benefits = [
+    "Rapports d'audit professionnels",
+    "Modèles personnalisables",
+    "Collaboration en temps réel"
+  ];
+
   return (
-    <div className="relative isolate overflow-hidden bg-white">
-      <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80" aria-hidden="true">
-        <div
-          className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-audit-blue-200 to-audit-blue-500 opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-          style={{
-            clipPath:
-              'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-          }}
-        />
-      </div>
-      <div className="audit-container py-24 sm:py-32">
-        <div className="mx-auto max-w-2xl text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl animate-fade-in">
-            Automatisez vos <span className="text-audit-blue-600">rapports d'audit</span> de systèmes d'information
-          </h1>
-          <p className="mt-6 text-lg leading-8 text-gray-600 animate-slide-up">
-            Notre plateforme simplifie la création de rapports d'audit complets, structurés et professionnels
-            pour vos analyses de systèmes d'information. Gagnez du temps et améliorez la qualité de vos livrables.
-          </p>
-          <div className="mt-10 flex items-center justify-center gap-x-6">
-            <Button 
-              asChild
-              className="bg-audit-blue-600 hover:bg-audit-blue-700 text-base font-semibold"
-              size="lg"
-            >
-              <Link to="/dashboard">
-                Commencer gratuitement
-              </Link>
-            </Button>
-            <Link
-              to="/#features"
-              className="text-base font-semibold leading-6 text-gray-900 flex items-center"
-            >
-              Découvrir nos fonctionnalités <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
+    <section className="pt-16 pb-24 bg-gradient-to-b from-white to-gray-50">
+      <div className="audit-container">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-8">
+            <div>
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-6">
+                Simplifiez vos audits avec notre plateforme intelligente
+              </h1>
+              <p className="text-xl text-audit-gray-600">
+                Créez, gérez et partagez des rapports d'audit professionnels en quelques clics. Notre outil tout-en-un vous aide à gagner du temps et à améliorer la qualité de vos audits.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {benefits.map((benefit, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                  <span className="text-audit-gray-700">{benefit}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button 
+                asChild
+                className="bg-audit-blue-600 hover:bg-audit-blue-700 h-12 px-6 text-lg"
+              >
+                <Link to="/dashboard">
+                  Commencer maintenant
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="h-12 px-6 text-lg"
+              >
+                Demander une démo
+              </Button>
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -top-8 -left-8 w-64 h-64 bg-audit-blue-100 rounded-full opacity-70 blur-3xl"></div>
+            <div className="absolute -bottom-8 -right-8 w-64 h-64 bg-audit-blue-200 rounded-full opacity-70 blur-3xl"></div>
+            
+            <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-200">
+              <div className="bg-audit-blue-600 text-white p-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Audit Report Wizard</h3>
+                  <div className="flex space-x-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="space-y-4">
+                  <div className="h-10 bg-audit-gray-100 rounded w-3/4"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-audit-gray-100 rounded w-full"></div>
+                    <div className="h-4 bg-audit-gray-100 rounded w-full"></div>
+                    <div className="h-4 bg-audit-gray-100 rounded w-2/3"></div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="h-24 bg-audit-gray-100 rounded"></div>
+                    <div className="h-24 bg-audit-gray-100 rounded"></div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-audit-gray-100 rounded w-full"></div>
+                    <div className="h-4 bg-audit-gray-100 rounded w-full"></div>
+                    <div className="h-4 bg-audit-gray-100 rounded w-3/4"></div>
+                  </div>
+                  <div className="flex justify-end">
+                    <div className="h-10 bg-audit-blue-600 rounded w-1/3"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]" aria-hidden="true">
-        <div
-          className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-audit-blue-500 to-audit-blue-200 opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
-          style={{
-            clipPath:
-              'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-          }}
-        />
-      </div>
-    </div>
+    </section>
   );
 };
 

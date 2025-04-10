@@ -1,61 +1,17 @@
 
-import { useState, useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import Layout from "@/components/Layout";
 import AuditForm, { AuditData } from "@/components/AuditForm";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, AlertTriangle, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Skeleton } from "@/components/ui/skeleton";
 
-// Mock audit data (same as in AuditDetails.tsx)
-const mockAudit: AuditData = {
-  id: 1,
-  title: "Audit SI - Société ABC",
-  client: "ABC Inc.",
-  contactName: "Jean Dupont",
-  contactEmail: "jean.dupont@abc-inc.com",
-  sector: "Technologie",
-  auditType: "Complet",
-  employeeCount: "250-500",
-  description: "Audit complet du système d'information avec focus sur la sécurité et l'infrastructure réseau.",
-  createdAt: "2023-12-01T09:00:00",
-  updatedAt: "2023-12-10T10:30:00",
-  status: "completed",
-  progress: 100,
-  sections: [
-    { id: "section1", title: "Introduction", progress: 100 },
-    { id: "section2", title: "Présentation de l'entreprise", progress: 100 },
-    { id: "section3", title: "État des lieux du SI", progress: 85 },
-    { id: "section4", title: "Analyse des flux de données", progress: 75 },
-    { id: "section5", title: "Exigences et contraintes", progress: 60 },
-    { id: "section6", title: "Architecture cible", progress: 40 },
-    { id: "section7", title: "Conclusion et recommandations", progress: 20 }
-  ],
-  findings: [
-    { id: 1, title: "Obsolescence des serveurs", severity: "high", area: "Infrastructure", description: "Les serveurs principaux datent de plus de 7 ans et présentent des risques importants de pannes." },
-    { id: 2, title: "Absence de politique de sécurité formalisée", severity: "medium", area: "Sécurité", description: "Aucune documentation sur les politiques de sécurité n'est disponible ou suivie." }
-  ],
-  recommendations: [
-    { id: 1, title: "Renouvellement du parc serveurs", priority: "high", timeframe: "3 mois", description: "Remplacer les serveurs obsolètes par des équipements récents avec garantie constructeur." },
-    { id: 2, title: "Création d'une PSSI", priority: "medium", timeframe: "6 mois", description: "Élaborer et documenter une Politique de Sécurité du Système d'Information complète." }
-  ]
-};
-
-const EditAudit = () => {
-  const { id } = useParams();
+const EditAuditPage = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [audit, setAudit] = useState<AuditData | null>(null);
@@ -63,236 +19,155 @@ const EditAudit = () => {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [navigationTarget, setNavigationTarget] = useState<string | null>(null);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [navDestination, setNavDestination] = useState<string | null>(null);
+  const originalAuditRef = useRef<AuditData | null>(null);
 
+  // Load audit data
   useEffect(() => {
-    // Add confirmation before leaving page if there are unsaved changes
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasChanges) {
-        e.preventDefault();
-        e.returnValue = ""; // Required for Chrome
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [hasChanges]);
-
-  useEffect(() => {
-    // Simulate API call to fetch audit data
     const fetchAudit = async () => {
       setLoading(true);
-      setError(null);
       try {
-        // In a real app, this would be an API call
-        // const response = await fetch(`/api/audits/${id}`);
-        // if (!response.ok) throw new Error(`Erreur ${response.status}: Impossible de récupérer l'audit`);
-        // const data = await response.json();
-        // setAudit(data);
+        // Simulating API call to fetch audit details
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Using mock data for now
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const mockAudit: AuditData = {
+          id: parseInt(id || "1"),
+          title: "Audit de sécurité - Société ABC",
+          client: "Société ABC",
+          clientContact: "Jean Dupont",
+          clientEmail: "jean.dupont@example.com",
+          startDate: "2023-05-10",
+          endDate: "2023-05-20",
+          scope: "Évaluation complète de l'infrastructure réseau et des applications web. Teste de pénétration et analyse des vulnérabilités selon les standards OWASP.",
+          methodology: "Nous avons utilisé une combinaison d'outils automatisés et de tests manuels pour identifier les vulnérabilités potentielles. Les tests ont été effectués à la fois en interne et à distance pour simuler différents types d'attaques.",
+          findings: "Plusieurs vulnérabilités critiques ont été identifiées, notamment des failles XSS dans l'application de gestion client et des configurations de pare-feu obsolètes. Des problèmes de mise à jour de logiciels ont également été détectés sur plusieurs serveurs.",
+          recommendations: "Mettre à jour immédiatement les configurations de pare-feu et appliquer les correctifs de sécurité disponibles. Implémenter une validation d'entrée stricte pour prévenir les attaques XSS. Établir un programme régulier de mise à jour pour tous les serveurs et applications.",
+          status: "completed",
+          progress: 100
+        };
         
-        if (!id || isNaN(Number(id))) {
-          throw new Error("ID d'audit invalide");
-        }
-        
-        setAudit({...mockAudit, id: Number(id)});
-      } catch (error) {
-        console.error("Error fetching audit:", error);
-        if (error instanceof Error) {
-          setError(error.message || "Impossible de charger les données de l'audit. Veuillez réessayer.");
-        } else {
-          setError("Impossible de charger les données de l'audit. Veuillez réessayer.");
-        }
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les données de l'audit",
-          variant: "destructive",
-        });
+        setAudit(mockAudit);
+        originalAuditRef.current = JSON.parse(JSON.stringify(mockAudit));
+        setError(null);
+      } catch (err) {
+        setError("Impossible de charger les détails de l'audit. Veuillez réessayer plus tard.");
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchAudit();
-  }, [id, toast]);
+  }, [id]);
 
-  const handleFormChange = () => {
-    setHasChanges(true);
+  // Intercept navigation to show unsaved changes dialog if needed
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasChanges]);
+
+  const handleFormChange = (changedData: Partial<AuditData>) => {
+    if (!originalAuditRef.current) return;
+    
+    // Check if there are any differences from the original data
+    const hasAnyChanges = Object.keys(changedData).some(key => {
+      const k = key as keyof AuditData;
+      return changedData[k] !== originalAuditRef.current?.[k];
+    });
+    
+    setHasChanges(hasAnyChanges);
   };
 
-  const handleSaveAudit = async (formData: AuditData) => {
+  const handleNavigate = (destination: string) => {
+    if (hasChanges) {
+      setNavDestination(destination);
+      setShowUnsavedDialog(true);
+    } else {
+      navigate(destination);
+    }
+  };
+
+  const handleConfirmNavigation = () => {
+    setShowUnsavedDialog(false);
+    if (navDestination) {
+      navigate(navDestination);
+    }
+  };
+
+  const handleSubmit = async (data: AuditData) => {
     setSaving(true);
     try {
-      // In a real app, this would be an API call to update the audit
-      // const response = await fetch(`/api/audits/${id}`, {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
-      // if (!response.ok) throw new Error(`Erreur ${response.status}: Impossible de mettre à jour l'audit`);
+      // Simulate API call to update audit
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Simulate network delay and validation
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Simulate validation error (10% chance)
-      if (Math.random() < 0.1) {
-        throw new Error("Erreur de validation lors de la sauvegarde des données");
-      }
-      
-      console.log("Saving audit with data:", formData);
-      
-      // Update the audit data with the updated timestamp
-      const updatedAudit = {
-        ...formData,
-        updatedAt: new Date().toISOString(),
-      };
-      
-      setAudit(updatedAudit);
+      // Update the reference to the original data after successful save
+      originalAuditRef.current = JSON.parse(JSON.stringify(data));
       setHasChanges(false);
       
-      // Show success toast
       toast({
-        title: "Audit mis à jour",
-        description: "Les modifications ont été enregistrées avec succès",
+        title: "Modifications enregistrées",
+        description: "Les modifications de l'audit ont été enregistrées avec succès.",
       });
       
-      // Navigate back to audit details page
       navigate(`/audits/${id}`);
-    } catch (error) {
-      console.error("Error saving audit:", error);
-      if (error instanceof Error) {
-        toast({
-          title: "Erreur",
-          description: error.message || "Impossible d'enregistrer les modifications. Veuillez réessayer.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Erreur",
-          description: "Impossible d'enregistrer les modifications. Veuillez réessayer.",
-          variant: "destructive",
-        });
-      }
+    } catch (err) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'enregistrer les modifications. Veuillez réessayer.",
+        variant: "destructive",
+      });
     } finally {
       setSaving(false);
     }
   };
 
-  const handleCancelNavigation = () => {
-    setShowConfirmDialog(false);
-    setNavigationTarget(null);
-  };
-
-  const handleConfirmNavigation = () => {
-    setShowConfirmDialog(false);
-    if (navigationTarget) {
-      navigate(navigationTarget);
-    }
-  };
-
-  const handleNavigation = (path: string) => {
-    if (hasChanges) {
-      setNavigationTarget(path);
-      setShowConfirmDialog(true);
-    } else {
-      navigate(path);
-    }
-  };
-
-  // Loading skeleton UI
   if (loading) {
     return (
       <Layout>
-        <div className="p-6 space-y-6">
-          <div className="flex items-center space-x-2">
-            <Skeleton className="h-10 w-10 rounded-full" />
-            <Skeleton className="h-10 w-40" />
+        <div className="audit-container py-8">
+          <div className="mb-6 flex items-center gap-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate(`/audits/${id}`)}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Button>
+            <Skeleton className="h-8 w-48" />
           </div>
-          <Skeleton className="h-12 w-3/4 my-2" />
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                <Skeleton className="h-14 w-full my-2" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Skeleton className="h-14 w-full" />
-                  <Skeleton className="h-14 w-full" />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Skeleton className="h-14 w-full" />
-                  <Skeleton className="h-14 w-full" />
-                  <Skeleton className="h-14 w-full" />
-                </div>
-                <Skeleton className="h-28 w-full" />
-              </div>
-            </CardContent>
-          </Card>
+          <Skeleton className="w-full h-[600px] rounded-lg" />
         </div>
       </Layout>
     );
   }
 
-  if (error) {
+  if (error || !audit) {
     return (
       <Layout>
-        <div className="p-6 space-y-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/dashboard')}
-            className="mb-4 text-audit-blue-600 hover:text-audit-blue-700 flex items-center"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" /> Retour au tableau de bord
-          </Button>
-          
+        <div className="audit-container py-8">
           <Alert variant="destructive" className="mb-6">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Erreur</AlertTitle>
-            <AlertDescription className="space-y-2">
-              <p>{error}</p>
-              <Button 
-                variant="outline" 
-                className="mt-2" 
-                onClick={() => window.location.reload()}
-              >
-                Réessayer
-              </Button>
-            </AlertDescription>
-          </Alert>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (!audit) {
-    return (
-      <Layout>
-        <div className="p-6 space-y-6">
-          <Alert variant="destructive" className="mb-6">
-            <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Erreur</AlertTitle>
             <AlertDescription>
-              Aucune donnée d'audit n'a été trouvée
-              <Button 
-                variant="outline" 
-                className="mt-2 mr-2" 
-                onClick={() => navigate('/dashboard')}
-              >
-                Retour au tableau de bord
-              </Button>
-              <Button 
-                variant="outline" 
-                className="mt-2" 
-                onClick={() => window.location.reload()}
-              >
-                Réessayer
-              </Button>
+              {error || "Audit non trouvé. Impossible de charger les données pour modification."}
             </AlertDescription>
           </Alert>
+          <div className="flex justify-start">
+            <Button 
+              onClick={() => navigate("/dashboard")}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Retour au tableau de bord
+            </Button>
+          </div>
         </div>
       </Layout>
     );
@@ -300,65 +175,56 @@ const EditAudit = () => {
 
   return (
     <Layout>
-      <div className="p-6 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
+      <div className="audit-container py-8">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2">
             <Button 
               variant="ghost" 
-              onClick={() => handleNavigation(`/audits/${id}`)}
-              className="mb-4 text-audit-blue-600 hover:text-audit-blue-700 flex items-center"
+              size="sm" 
+              onClick={() => handleNavigate(`/audits/${id}`)}
             >
-              <ArrowLeft className="h-4 w-4 mr-1" /> Retour aux détails de l'audit
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour aux détails
             </Button>
-            <h1 className="text-2xl font-bold tracking-tight">
-              Modifier l'audit: {audit.title}
-            </h1>
+            <h1 className="text-2xl font-bold">Modifier l'audit</h1>
           </div>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              onClick={() => handleNavigation(`/audits/${id}`)}
-              disabled={saving}
-            >
-              Annuler
-            </Button>
-            {hasChanges && (
-              <div className="text-xs text-amber-600 italic mt-2">
-                * Des modifications non enregistrées
-              </div>
-            )}
-          </div>
+          
+          {hasChanges && (
+            <div className="text-sm text-muted-foreground">
+              Modifications non enregistrées
+            </div>
+          )}
         </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <AuditForm 
-              initialData={audit} 
-              onSubmit={handleSaveAudit}
-              isEditing={true}
-              onChange={handleFormChange}
-            />
-          </CardContent>
-        </Card>
+        <AuditForm 
+          initialData={audit} 
+          onSubmit={handleSubmit} 
+          isEditing={true}
+          onChange={handleFormChange}
+        />
 
-        {/* Confirmation Dialog for Unsaved Changes */}
-        <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Modifications non enregistrées</AlertDialogTitle>
-              <AlertDialogDescription>
-                Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir quitter cette page? Les modifications seront perdues.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={handleCancelNavigation}>Annuler</AlertDialogCancel>
-              <AlertDialogAction onClick={handleConfirmNavigation}>Continuer</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        {/* Dialog for unsaved changes */}
+        <Dialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Modifications non enregistrées</DialogTitle>
+              <DialogDescription>
+                Vous avez des modifications non enregistrées. Voulez-vous quitter sans enregistrer ?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowUnsavedDialog(false)}>
+                Continuer l'édition
+              </Button>
+              <Button onClick={handleConfirmNavigation} variant="destructive">
+                Quitter sans enregistrer
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
 };
 
-export default EditAudit;
+export default EditAuditPage;

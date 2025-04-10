@@ -1,363 +1,386 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { CheckCircle, FileText, Info, Users, Server, Database, ShieldCheck, BarChart, FileQuestion } from "lucide-react";
+
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Calendar, Clipboard, FileText, Info, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
-// Sections of the audit report
-const reportSections = [
-  { id: "intro", title: "Introduction", icon: FileText, required: true },
-  { id: "company", title: "Présentation de l'entreprise", icon: Users, required: true },
-  { id: "technical", title: "État des lieux technique du SI", icon: Server, required: true },
-  { id: "data", title: "Analyse des flux de données", icon: Database, required: true },
-  { id: "constraints", title: "Contraintes et enjeux", icon: Info, required: true },
-  { id: "requirements", title: "Exigences fonctionnelles et non-fonctionnelles", icon: FileQuestion, required: true },
-  { id: "summary", title: "Synthèse de l'audit", icon: CheckCircle, required: true },
-  { id: "architecture", title: "Conception de l'architecture cible", icon: Server, required: false },
-  { id: "security", title: "Recommandations de sécurité", icon: ShieldCheck, required: false },
-  { id: "kpi", title: "Indicateurs de validation et dashboard", icon: BarChart, required: false },
-];
-
-// Define a proper type for the audit data
 export interface AuditData {
   id?: number;
   title: string;
   client: string;
-  contactName: string;
-  contactEmail: string;
-  sector: string;
-  auditType: string;
-  employeeCount: string;
-  description: string;
-  sections?: Array<{ id: string; title: string; progress: number }>;
-  createdAt?: string;
-  updatedAt?: string;
-  status?: string;
-  progress?: number;
-  findings?: Array<{ id: number; title: string; severity: string; area: string; description: string }>;
-  recommendations?: Array<{ id: number; title: string; priority: string; timeframe: string; description: string }>;
+  clientContact: string;
+  clientEmail: string;
+  startDate: string;
+  endDate: string;
+  scope: string;
+  methodology: string;
+  findings: string;
+  recommendations: string;
+  status: "draft" | "in-progress" | "completed";
+  progress: number;
 }
 
-// Define the interface for the props
-export interface AuditFormProps {
-  initialData?: AuditData;
-  onSubmit?: (formData: any) => void;
+const auditFormSchema = z.object({
+  title: z.string().min(3, {
+    message: "Le titre doit contenir au moins 3 caractères",
+  }),
+  client: z.string().min(2, {
+    message: "Le nom du client est requis",
+  }),
+  clientContact: z.string().min(2, {
+    message: "Le nom du contact est requis",
+  }),
+  clientEmail: z.string().email({
+    message: "Veuillez entrer une adresse email valide",
+  }),
+  startDate: z.string().min(1, {
+    message: "La date de début est requise",
+  }),
+  endDate: z.string().min(1, {
+    message: "La date de fin est requise",
+  }),
+  scope: z.string().min(10, {
+    message: "Le périmètre doit contenir au moins 10 caractères",
+  }),
+  methodology: z.string().optional(),
+  findings: z.string().optional(),
+  recommendations: z.string().optional(),
+});
+
+interface AuditFormProps {
+  initialData?: Partial<AuditData>;
+  onSubmit: (data: AuditData) => void;
   isEditing?: boolean;
-  onChange?: () => void;
+  onChange?: (data: Partial<AuditData>) => void;
 }
 
-const AuditForm = ({ initialData, onSubmit, isEditing = false, onChange }: AuditFormProps) => {
-  const navigate = useNavigate();
+const AuditForm = ({
+  initialData,
+  onSubmit,
+  isEditing = false,
+  onChange,
+}: AuditFormProps) => {
   const { toast } = useToast();
-  
-  const [formData, setFormData] = useState({
-    title: initialData?.title || "",
-    client: initialData?.client || "",
-    contactName: initialData?.contactName || "",
-    contactEmail: initialData?.contactEmail || "",
-    sector: initialData?.sector || "",
-    auditType: initialData?.auditType || "",
-    employeeCount: initialData?.employeeCount || "",
-    description: initialData?.description || "",
-    selectedSections: initialData?.sections 
-      ? initialData.sections.map((section: any) => section.id)
-      : reportSections.filter(section => section.required).map(section => section.id),
+  const [activeTab, setActiveTab] = useState("info");
+
+  const defaultValues: Partial<AuditData> = {
+    title: "",
+    client: "",
+    clientContact: "",
+    clientEmail: "",
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    scope: "",
+    methodology: "",
+    findings: "",
+    recommendations: "",
+    status: "draft",
+    progress: 0,
+    ...initialData,
+  };
+
+  const form = useForm<AuditData>({
+    resolver: zodResolver(auditFormSchema),
+    defaultValues,
   });
 
-  // Update form data if initialData changes
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        title: initialData.title || "",
-        client: initialData.client || "",
-        contactName: initialData.contactName || "",
-        contactEmail: initialData.contactEmail || "",
-        sector: initialData.sector || "",
-        auditType: initialData.auditType || "",
-        employeeCount: initialData.employeeCount || "",
-        description: initialData.description || "",
-        selectedSections: initialData.sections 
-          ? initialData.sections.map((section: any) => section.id)
-          : reportSections.filter(section => section.required).map(section => section.id),
-      });
+  const handleSubmit = (data: AuditData) => {
+    // Calculate progress based on filled fields
+    const totalFields = Object.keys(auditFormSchema.shape).length;
+    const filledFields = Object.entries(data).filter(
+      ([key, value]) => value && auditFormSchema.shape[key as keyof typeof auditFormSchema.shape]
+    ).length;
+    
+    const progress = Math.round((filledFields / totalFields) * 100);
+    
+    const formData = {
+      ...data,
+      progress,
+      status: progress === 100 ? "completed" : progress > 30 ? "in-progress" : "draft"
+    } as AuditData;
+    
+    onSubmit(formData);
+  };
+
+  const handleFieldChange = () => {
+    if (onChange) {
+      const currentValues = form.getValues();
+      onChange(currentValues);
     }
-  }, [initialData]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (onChange) onChange();
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (onChange) onChange();
-  };
-
-  const toggleSection = (sectionId: string) => {
-    setFormData(prev => {
-      const selectedSections = [...prev.selectedSections];
-      const section = reportSections.find(s => s.id === sectionId);
-      
-      // Can't remove required sections
-      if (section?.required) return prev;
-      
-      if (selectedSections.includes(sectionId)) {
-        const newSections = selectedSections.filter(id => id !== sectionId);
-        if (onChange) onChange();
-        return {
-          ...prev,
-          selectedSections: newSections
-        };
-      } else {
-        const newSections = [...selectedSections, sectionId];
-        if (onChange) onChange();
-        return {
-          ...prev,
-          selectedSections: newSections
-        };
-      }
-    });
-  };
-
-  const isSectionSelected = (sectionId: string) => {
-    return formData.selectedSections.includes(sectionId);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validation
-    if (!formData.title.trim() || !formData.client.trim() || !formData.auditType) {
-      toast({
-        title: "Formulaire incomplet",
-        description: "Veuillez remplir tous les champs obligatoires.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // If custom onSubmit is provided, use it
-    if (onSubmit) {
-      const dataToSubmit = {
-        ...formData,
-        id: initialData?.id
-      };
-      
-      onSubmit(dataToSubmit);
-      return;
-    }
-    
-    // Default behavior for creating a new audit
-    console.log("Audit form submitted:", formData);
-    
-    // Show success message
-    toast({
-      title: "Audit créé avec succès",
-      description: "Votre projet d'audit a été créé et est prêt à être complété.",
-    });
-    
-    // Redirect to dashboard
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 1500);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>{isEditing ? "Modifier l'audit" : "Informations générales"}</CardTitle>
-          <CardDescription>
-            {isEditing 
-              ? "Modifiez les informations de base concernant votre audit."
-              : "Renseignez les informations de base concernant votre audit."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Titre du rapport <span className="text-red-500">*</span></Label>
-              <Input
-                id="title"
-                name="title"
-                placeholder="Ex: Audit du SI - Entreprise XYZ"
-                value={formData.title}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="client">Nom du client <span className="text-red-500">*</span></Label>
-              <Input
-                id="client"
-                name="client"
-                placeholder="Nom de l'entreprise cliente"
-                value={formData.client}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="contactName">Nom du contact</Label>
-              <Input
-                id="contactName"
-                name="contactName"
-                placeholder="Prénom et nom du contact principal"
-                value={formData.contactName}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="contactEmail">Email du contact</Label>
-              <Input
-                id="contactEmail"
-                name="contactEmail"
-                type="email"
-                placeholder="email@example.com"
-                value={formData.contactEmail}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="sector">Secteur d'activité</Label>
-              <Select 
-                name="sector" 
-                value={formData.sector}
-                onValueChange={(value) => handleSelectChange("sector", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un secteur" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="finance">Finance & Banque</SelectItem>
-                  <SelectItem value="health">Santé</SelectItem>
-                  <SelectItem value="retail">Commerce & Distribution</SelectItem>
-                  <SelectItem value="manufacturing">Industrie</SelectItem>
-                  <SelectItem value="public">Secteur Public</SelectItem>
-                  <SelectItem value="tech">Technologie & IT</SelectItem>
-                  <SelectItem value="education">Éducation</SelectItem>
-                  <SelectItem value="other">Autre</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="auditType">Type d'audit <span className="text-red-500">*</span></Label>
-              <Select 
-                name="auditType" 
-                value={formData.auditType}
-                onValueChange={(value) => handleSelectChange("auditType", value)}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="complete">Audit complet du SI</SelectItem>
-                  <SelectItem value="security">Audit de sécurité</SelectItem>
-                  <SelectItem value="performance">Audit de performance</SelectItem>
-                  <SelectItem value="compliance">Audit de conformité</SelectItem>
-                  <SelectItem value="infrastructure">Audit d'infrastructure</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="employeeCount">Nombre d'employés</Label>
-              <Input
-                id="employeeCount"
-                name="employeeCount"
-                type="number"
-                min="1"
-                placeholder="Ex: 250"
-                value={formData.employeeCount}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="description">Description de l'audit</Label>
-            <Textarea
-              id="description"
-              name="description"
-              placeholder="Décrivez brièvement l'objectif et le périmètre de cet audit..."
-              rows={4}
-              value={formData.description}
-              onChange={handleInputChange}
-            />
-          </div>
-        </CardContent>
-      </Card>
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          {isEditing ? "Modifier l'audit" : "Nouvel audit"}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form 
+            onSubmit={form.handleSubmit(handleSubmit)}
+            onChange={handleFieldChange}
+            className="space-y-6"
+          >
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid grid-cols-4 mb-6">
+                <TabsTrigger value="info" className="flex items-center gap-2">
+                  <Info className="h-4 w-4" />
+                  <span className="hidden sm:inline">Informations</span>
+                </TabsTrigger>
+                <TabsTrigger value="client" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  <span className="hidden sm:inline">Client</span>
+                </TabsTrigger>
+                <TabsTrigger value="scope" className="flex items-center gap-2">
+                  <Clipboard className="h-4 w-4" />
+                  <span className="hidden sm:inline">Périmètre</span>
+                </TabsTrigger>
+                <TabsTrigger value="results" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span className="hidden sm:inline">Résultats</span>
+                </TabsTrigger>
+              </TabsList>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Sections du rapport</CardTitle>
-          <CardDescription>
-            Sélectionnez les sections que vous souhaitez inclure dans votre rapport d'audit.
-            Les sections obligatoires sont pré-sélectionnées.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {reportSections.map((section) => (
-              <div
-                key={section.id}
-                className={`flex items-center p-4 rounded-lg border cursor-pointer ${
-                  isSectionSelected(section.id)
-                    ? "border-audit-blue-600 bg-audit-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-                onClick={() => toggleSection(section.id)}
-              >
-                <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                  isSectionSelected(section.id) ? "bg-audit-blue-600" : "bg-gray-100"
-                }`}>
-                  <section.icon className={`h-4 w-4 ${
-                    isSectionSelected(section.id) ? "text-white" : "text-gray-500"
-                  }`} />
-                </div>
-                <div className="ml-4">
-                  <p className="font-medium">{section.title}</p>
-                  {section.required && (
-                    <p className="text-xs text-audit-blue-600">Obligatoire</p>
+              <TabsContent value="info" className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Titre de l'audit</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="ex. Audit de sécurité - Société ABC"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
+                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date de début</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                              type="date"
+                              className="pl-9"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="endDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date de fin</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                              type="date"
+                              className="pl-9"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              </TabsContent>
 
-      <div className="flex justify-end gap-4">
-        <Button 
-          variant="outline" 
-          type="button" 
-          onClick={() => navigate(isEditing ? `/audits/${initialData?.id}` : "/dashboard")}
-        >
-          {isEditing ? "Annuler" : "Annuler"}
-        </Button>
-        <Button type="submit" className="bg-audit-blue-600 hover:bg-audit-blue-700">
-          {isEditing ? "Enregistrer les modifications" : "Créer l'audit"}
-        </Button>
-      </div>
-    </form>
+              <TabsContent value="client" className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="client"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom du client</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="ex. Société ABC"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="clientContact"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Personne de contact</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="ex. Jean Dupont"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="clientEmail"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email de contact</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="ex. jean.dupont@example.com"
+                            type="email"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="scope" className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="scope"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Périmètre de l'audit</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Décrivez le périmètre de l'audit..."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Détaillez les aspects couverts par l'audit.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="methodology"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Méthodologie</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Décrivez la méthodologie utilisée..."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Expliquez l'approche et les outils utilisés.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+
+              <TabsContent value="results" className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="findings"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Constatations</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Décrivez les principales constatations..."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Listez les problèmes et vulnérabilités découverts.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="recommendations"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Recommandations</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Listez vos recommandations..."
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Proposez des solutions et améliorations.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+            </Tabs>
+
+            <div className="flex justify-end gap-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  setActiveTab(activeTab === "info" ? "client" : 
+                                activeTab === "client" ? "scope" : 
+                                activeTab === "scope" ? "results" : "info");
+                }}
+              >
+                {activeTab === "results" ? "Retour au début" : "Suivant"}
+              </Button>
+              <Button type="submit" className="bg-audit-blue-600 hover:bg-audit-blue-700">
+                {isEditing ? "Mettre à jour" : "Créer l'audit"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 };
 
