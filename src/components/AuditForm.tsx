@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle, FileText, Info, Users, Server, Database, ShieldCheck, BarChart, FileQuestion } from "lucide-react";
@@ -55,9 +54,10 @@ export interface AuditFormProps {
   initialData?: AuditData;
   onSubmit?: (formData: any) => void;
   isEditing?: boolean;
+  onChange?: () => void;
 }
 
-const AuditForm = ({ initialData, onSubmit, isEditing = false }: AuditFormProps) => {
+const AuditForm = ({ initialData, onSubmit, isEditing = false, onChange }: AuditFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -97,10 +97,12 @@ const AuditForm = ({ initialData, onSubmit, isEditing = false }: AuditFormProps)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (onChange) onChange();
   };
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (onChange) onChange();
   };
 
   const toggleSection = (sectionId: string) => {
@@ -112,14 +114,18 @@ const AuditForm = ({ initialData, onSubmit, isEditing = false }: AuditFormProps)
       if (section?.required) return prev;
       
       if (selectedSections.includes(sectionId)) {
+        const newSections = selectedSections.filter(id => id !== sectionId);
+        if (onChange) onChange();
         return {
           ...prev,
-          selectedSections: selectedSections.filter(id => id !== sectionId)
+          selectedSections: newSections
         };
       } else {
+        const newSections = [...selectedSections, sectionId];
+        if (onChange) onChange();
         return {
           ...prev,
-          selectedSections: [...selectedSections, sectionId]
+          selectedSections: newSections
         };
       }
     });
@@ -144,7 +150,12 @@ const AuditForm = ({ initialData, onSubmit, isEditing = false }: AuditFormProps)
     
     // If custom onSubmit is provided, use it
     if (onSubmit) {
-      onSubmit(formData);
+      const dataToSubmit = {
+        ...formData,
+        id: initialData?.id
+      };
+      
+      onSubmit(dataToSubmit);
       return;
     }
     
