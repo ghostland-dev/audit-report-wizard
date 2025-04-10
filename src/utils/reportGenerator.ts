@@ -368,7 +368,8 @@ export const sanitizeAuditData = (auditData: AuditData): Partial<AuditData> => {
   
   Object.entries(auditData).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
-      sanitized[key as keyof AuditData] = value;
+      // Use type assertion to let TypeScript know this is a valid key
+      sanitized[key as keyof AuditData] = value as any as AuditData[keyof AuditData];
     }
   });
   
