@@ -18,17 +18,17 @@ export const generateReportText = (auditData: AuditData): string => {
   }
   
   // Introduction section
-  if (auditData.introduction) {
+  if ('introduction' in auditData && auditData.introduction) {
     report.push(`\n## Introduction\n${auditData.introduction}`);
   }
   
   // Company presentation
-  if (auditData.companyPresentation) {
+  if ('companyPresentation' in auditData && auditData.companyPresentation) {
     report.push(`\n## Présentation générale de l'entreprise\n${auditData.companyPresentation}`);
   }
   
   // Technical organization state
-  if (auditData.technicalState) {
+  if ('technicalState' in auditData && auditData.technicalState) {
     report.push(`\n## État des lieux de l'organisation technique du SI\n${auditData.technicalState}`);
   }
   
@@ -38,12 +38,12 @@ export const generateReportText = (auditData: AuditData): string => {
   }
   
   // Data flow analysis
-  if (auditData.dataFlowAnalysis) {
+  if ('dataFlowAnalysis' in auditData && auditData.dataFlowAnalysis) {
     report.push(`\n## Analyse des flux de données\n${auditData.dataFlowAnalysis}`);
   }
   
   // Constraints and challenges
-  if (auditData.constraints) {
+  if ('constraints' in auditData && auditData.constraints) {
     report.push(`\n## Contraintes et enjeux\n${auditData.constraints}`);
   }
   
@@ -53,7 +53,7 @@ export const generateReportText = (auditData: AuditData): string => {
   }
   
   // Functional and non-functional requirements
-  if (auditData.requirements) {
+  if ('requirements' in auditData && auditData.requirements) {
     report.push(`\n## Exigences fonctionnelles et non-fonctionnelles\n${auditData.requirements}`);
   }
   
@@ -63,12 +63,12 @@ export const generateReportText = (auditData: AuditData): string => {
   }
   
   // Audit summary
-  if (auditData.auditSummary) {
+  if ('auditSummary' in auditData && auditData.auditSummary) {
     report.push(`\n## Synthèse de l'audit\n${auditData.auditSummary}`);
   }
   
   // Target architecture design
-  if (auditData.targetArchitecture) {
+  if ('targetArchitecture' in auditData && auditData.targetArchitecture) {
     report.push(`\n## Conception de l'architecture cible\n${auditData.targetArchitecture}`);
   }
   
@@ -78,22 +78,22 @@ export const generateReportText = (auditData: AuditData): string => {
   }
   
   // Validation indicators and monitoring dashboard
-  if (auditData.validationIndicators) {
+  if ('validationIndicators' in auditData && auditData.validationIndicators) {
     report.push(`\n## Indicateurs de validation et dashboard de suivi\n${auditData.validationIndicators}`);
   }
   
   // Strategic advice for decision makers
-  if (auditData.strategicAdvice) {
+  if ('strategicAdvice' in auditData && auditData.strategicAdvice) {
     report.push(`\n## Conseils stratégiques pour les décideurs\n${auditData.strategicAdvice}`);
   }
   
   // Bibliography
-  if (auditData.bibliography) {
+  if ('bibliography' in auditData && auditData.bibliography) {
     report.push(`\n## Bibliographie / Webographie\n${auditData.bibliography}`);
   }
   
   // Conclusion
-  if (auditData.conclusion) {
+  if ('conclusion' in auditData && auditData.conclusion) {
     report.push(`\n## Conclusion générale\n${auditData.conclusion}`);
   }
   
@@ -131,19 +131,19 @@ export const generateFormattedPDF = (auditData: AuditData): string => {
       `<p><strong>Période:</strong> ${auditData.startDate} au ${auditData.endDate}</p>` : ''}
   </div>
   
-  ${auditData.introduction ? 
+  ${'introduction' in auditData && auditData.introduction ? 
     `<div class="section">
       <h2>Introduction</h2>
       <p>${auditData.introduction}</p>
     </div>` : ''}
   
-  ${auditData.companyPresentation ? 
+  ${'companyPresentation' in auditData && auditData.companyPresentation ? 
     `<div class="section">
       <h2>Présentation générale de l'entreprise</h2>
       <p>${auditData.companyPresentation}</p>
     </div>` : ''}
   
-  ${auditData.technicalState ? 
+  ${'technicalState' in auditData && auditData.technicalState ? 
     `<div class="section">
       <h2>État des lieux de l'organisation technique du SI</h2>
       <p>${auditData.technicalState}</p>
@@ -155,13 +155,13 @@ export const generateFormattedPDF = (auditData: AuditData): string => {
       <p>${auditData.scope}</p>
     </div>` : ''}
   
-  ${auditData.dataFlowAnalysis ? 
+  ${'dataFlowAnalysis' in auditData && auditData.dataFlowAnalysis ? 
     `<div class="section">
       <h2>Analyse des flux de données</h2>
       <p>${auditData.dataFlowAnalysis}</p>
     </div>` : ''}
   
-  ${auditData.constraints ? 
+  ${'constraints' in auditData && auditData.constraints ? 
     `<div class="section">
       <h2>Contraintes et enjeux</h2>
       <p>${auditData.constraints}</p>
@@ -173,7 +173,7 @@ export const generateFormattedPDF = (auditData: AuditData): string => {
       <p>${auditData.methodology}</p>
     </div>` : ''}
   
-  ${auditData.requirements ? 
+  ${'requirements' in auditData && auditData.requirements ? 
     `<div class="section">
       <h2>Exigences fonctionnelles et non-fonctionnelles</h2>
       <p>${auditData.requirements}</p>
@@ -185,13 +185,13 @@ export const generateFormattedPDF = (auditData: AuditData): string => {
       <p>${auditData.findings}</p>
     </div>` : ''}
   
-  ${auditData.auditSummary ? 
+  ${'auditSummary' in auditData && auditData.auditSummary ? 
     `<div class="section">
       <h2>Synthèse de l'audit</h2>
       <p>${auditData.auditSummary}</p>
     </div>` : ''}
   
-  ${auditData.targetArchitecture ? 
+  ${'targetArchitecture' in auditData && auditData.targetArchitecture ? 
     `<div class="section">
       <h2>Conception de l'architecture cible</h2>
       <p>${auditData.targetArchitecture}</p>
@@ -203,25 +203,25 @@ export const generateFormattedPDF = (auditData: AuditData): string => {
       <p>${auditData.recommendations}</p>
     </div>` : ''}
   
-  ${auditData.validationIndicators ? 
+  ${'validationIndicators' in auditData && auditData.validationIndicators ? 
     `<div class="section">
       <h2>Indicateurs de validation et dashboard de suivi</h2>
       <p>${auditData.validationIndicators}</p>
     </div>` : ''}
   
-  ${auditData.strategicAdvice ? 
+  ${'strategicAdvice' in auditData && auditData.strategicAdvice ? 
     `<div class="section">
       <h2>Conseils stratégiques pour les décideurs</h2>
       <p>${auditData.strategicAdvice}</p>
     </div>` : ''}
   
-  ${auditData.bibliography ? 
+  ${'bibliography' in auditData && auditData.bibliography ? 
     `<div class="section">
       <h2>Bibliographie / Webographie</h2>
       <p>${auditData.bibliography}</p>
     </div>` : ''}
   
-  ${auditData.conclusion ? 
+  ${'conclusion' in auditData && auditData.conclusion ? 
     `<div class="section">
       <h2>Conclusion générale</h2>
       <p>${auditData.conclusion}</p>
