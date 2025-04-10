@@ -18,18 +18,18 @@ export const generateReportText = (auditData: AuditData): string => {
   }
   
   // Introduction section
-  if ('introduction' in auditData && (auditData as any).introduction) {
-    report.push(`\n## Introduction\n${(auditData as any).introduction}`);
+  if (auditData.introduction) {
+    report.push(`\n## Introduction\n${auditData.introduction}`);
   }
   
   // Company presentation
-  if ('companyPresentation' in auditData && (auditData as any).companyPresentation) {
-    report.push(`\n## Présentation générale de l'entreprise\n${(auditData as any).companyPresentation}`);
+  if (auditData.companyPresentation) {
+    report.push(`\n## Présentation générale de l'entreprise\n${auditData.companyPresentation}`);
   }
   
   // Technical organization state
-  if ('technicalState' in auditData && (auditData as any).technicalState) {
-    report.push(`\n## État des lieux de l'organisation technique du SI\n${(auditData as any).technicalState}`);
+  if (auditData.technicalState) {
+    report.push(`\n## État des lieux de l'organisation technique du SI\n${auditData.technicalState}`);
   }
   
   // Audit scope
@@ -38,13 +38,13 @@ export const generateReportText = (auditData: AuditData): string => {
   }
   
   // Data flow analysis
-  if ('dataFlowAnalysis' in auditData && (auditData as any).dataFlowAnalysis) {
-    report.push(`\n## Analyse des flux de données\n${(auditData as any).dataFlowAnalysis}`);
+  if (auditData.dataFlowAnalysis) {
+    report.push(`\n## Analyse des flux de données\n${auditData.dataFlowAnalysis}`);
   }
   
   // Constraints and challenges
-  if ('constraints' in auditData && (auditData as any).constraints) {
-    report.push(`\n## Contraintes et enjeux\n${(auditData as any).constraints}`);
+  if (auditData.constraints) {
+    report.push(`\n## Contraintes et enjeux\n${auditData.constraints}`);
   }
   
   // Methodology used
@@ -53,8 +53,8 @@ export const generateReportText = (auditData: AuditData): string => {
   }
   
   // Functional and non-functional requirements
-  if ('requirements' in auditData && (auditData as any).requirements) {
-    report.push(`\n## Exigences fonctionnelles et non-fonctionnelles\n${(auditData as any).requirements}`);
+  if (auditData.requirements) {
+    report.push(`\n## Exigences fonctionnelles et non-fonctionnelles\n${auditData.requirements}`);
   }
   
   // Main findings
@@ -63,13 +63,13 @@ export const generateReportText = (auditData: AuditData): string => {
   }
   
   // Audit summary
-  if ('auditSummary' in auditData && (auditData as any).auditSummary) {
-    report.push(`\n## Synthèse de l'audit\n${(auditData as any).auditSummary}`);
+  if (auditData.auditSummary) {
+    report.push(`\n## Synthèse de l'audit\n${auditData.auditSummary}`);
   }
   
   // Target architecture design
-  if ('targetArchitecture' in auditData && (auditData as any).targetArchitecture) {
-    report.push(`\n## Conception de l'architecture cible\n${(auditData as any).targetArchitecture}`);
+  if (auditData.targetArchitecture) {
+    report.push(`\n## Conception de l'architecture cible\n${auditData.targetArchitecture}`);
   }
   
   // Recommendations
@@ -78,40 +78,177 @@ export const generateReportText = (auditData: AuditData): string => {
   }
   
   // Validation indicators and monitoring dashboard
-  if ('validationIndicators' in auditData && (auditData as any).validationIndicators) {
-    report.push(`\n## Indicateurs de validation et dashboard de suivi\n${(auditData as any).validationIndicators}`);
+  if (auditData.validationIndicators) {
+    report.push(`\n## Indicateurs de validation et dashboard de suivi\n${auditData.validationIndicators}`);
   }
   
   // Strategic advice for decision makers
-  if ('strategicAdvice' in auditData && (auditData as any).strategicAdvice) {
-    report.push(`\n## Conseils stratégiques pour les décideurs\n${(auditData as any).strategicAdvice}`);
+  if (auditData.strategicAdvice) {
+    report.push(`\n## Conseils stratégiques pour les décideurs\n${auditData.strategicAdvice}`);
   }
   
   // Bibliography
-  if ('bibliography' in auditData && (auditData as any).bibliography) {
-    report.push(`\n## Bibliographie / Webographie\n${(auditData as any).bibliography}`);
+  if (auditData.bibliography) {
+    report.push(`\n## Bibliographie / Webographie\n${auditData.bibliography}`);
   }
   
   // Conclusion
-  if ('conclusion' in auditData && (auditData as any).conclusion) {
-    report.push(`\n## Conclusion générale\n${(auditData as any).conclusion}`);
+  if (auditData.conclusion) {
+    report.push(`\n## Conclusion générale\n${auditData.conclusion}`);
   }
   
   return report.join('\n');
 };
 
 /**
+ * Creates a more formatted PDF structure with styling
+ * In a real app, this would generate a proper PDF using a library
+ */
+export const generateFormattedPDF = (auditData: AuditData): string => {
+  // This is a simulated PDF structure with some basic styling instructions
+  // In a real app, this would be replaced with actual PDF generation logic
+  
+  const pdfStructure = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>${auditData.title || "Rapport d'audit"}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    h1 { color: #1a56db; text-align: center; margin-bottom: 30px; }
+    h2 { color: #1e429f; margin-top: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+    .header-info { color: #4b5563; margin-bottom: 30px; text-align: center; }
+    .section { margin-bottom: 20px; }
+    .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #6b7280; }
+  </style>
+</head>
+<body>
+  <h1>${auditData.title || "Rapport d'audit"}</h1>
+  
+  <div class="header-info">
+    <p><strong>Client:</strong> ${auditData.client || "Non spécifié"}</p>
+    ${auditData.startDate && auditData.endDate ? 
+      `<p><strong>Période:</strong> ${auditData.startDate} au ${auditData.endDate}</p>` : ''}
+  </div>
+  
+  ${auditData.introduction ? 
+    `<div class="section">
+      <h2>Introduction</h2>
+      <p>${auditData.introduction}</p>
+    </div>` : ''}
+  
+  ${auditData.companyPresentation ? 
+    `<div class="section">
+      <h2>Présentation générale de l'entreprise</h2>
+      <p>${auditData.companyPresentation}</p>
+    </div>` : ''}
+  
+  ${auditData.technicalState ? 
+    `<div class="section">
+      <h2>État des lieux de l'organisation technique du SI</h2>
+      <p>${auditData.technicalState}</p>
+    </div>` : ''}
+  
+  ${auditData.scope ? 
+    `<div class="section">
+      <h2>Périmètre de l'audit</h2>
+      <p>${auditData.scope}</p>
+    </div>` : ''}
+  
+  ${auditData.dataFlowAnalysis ? 
+    `<div class="section">
+      <h2>Analyse des flux de données</h2>
+      <p>${auditData.dataFlowAnalysis}</p>
+    </div>` : ''}
+  
+  ${auditData.constraints ? 
+    `<div class="section">
+      <h2>Contraintes et enjeux</h2>
+      <p>${auditData.constraints}</p>
+    </div>` : ''}
+  
+  ${auditData.methodology ? 
+    `<div class="section">
+      <h2>Méthodologie</h2>
+      <p>${auditData.methodology}</p>
+    </div>` : ''}
+  
+  ${auditData.requirements ? 
+    `<div class="section">
+      <h2>Exigences fonctionnelles et non-fonctionnelles</h2>
+      <p>${auditData.requirements}</p>
+    </div>` : ''}
+  
+  ${auditData.findings ? 
+    `<div class="section">
+      <h2>Constatations principales</h2>
+      <p>${auditData.findings}</p>
+    </div>` : ''}
+  
+  ${auditData.auditSummary ? 
+    `<div class="section">
+      <h2>Synthèse de l'audit</h2>
+      <p>${auditData.auditSummary}</p>
+    </div>` : ''}
+  
+  ${auditData.targetArchitecture ? 
+    `<div class="section">
+      <h2>Conception de l'architecture cible</h2>
+      <p>${auditData.targetArchitecture}</p>
+    </div>` : ''}
+  
+  ${auditData.recommendations ? 
+    `<div class="section">
+      <h2>Recommandations</h2>
+      <p>${auditData.recommendations}</p>
+    </div>` : ''}
+  
+  ${auditData.validationIndicators ? 
+    `<div class="section">
+      <h2>Indicateurs de validation et dashboard de suivi</h2>
+      <p>${auditData.validationIndicators}</p>
+    </div>` : ''}
+  
+  ${auditData.strategicAdvice ? 
+    `<div class="section">
+      <h2>Conseils stratégiques pour les décideurs</h2>
+      <p>${auditData.strategicAdvice}</p>
+    </div>` : ''}
+  
+  ${auditData.bibliography ? 
+    `<div class="section">
+      <h2>Bibliographie / Webographie</h2>
+      <p>${auditData.bibliography}</p>
+    </div>` : ''}
+  
+  ${auditData.conclusion ? 
+    `<div class="section">
+      <h2>Conclusion générale</h2>
+      <p>${auditData.conclusion}</p>
+    </div>` : ''}
+  
+  <div class="footer">
+    <p>Document généré le ${new Date().toLocaleDateString('fr-FR')}</p>
+  </div>
+</body>
+</html>
+  `;
+  
+  return pdfStructure;
+};
+
+/**
  * In a real application, this would generate a PDF file using a library like pdfmake
- * For this demo, we'll simulate it by creating a downloadable text file
+ * For this demo, we'll simulate it by creating a downloadable HTML file styled to look like a PDF
  */
 export const downloadAsPDF = (auditData: AuditData) => {
-  const reportText = generateReportText(auditData);
-  const blob = new Blob([reportText], { type: 'text/plain' });
+  const htmlContent = generateFormattedPDF(auditData);
+  const blob = new Blob([htmlContent], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   
   link.href = url;
-  link.download = `${auditData.title || 'rapport-audit'}.txt`;
+  link.download = `${auditData.title || 'rapport-audit'}.html`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

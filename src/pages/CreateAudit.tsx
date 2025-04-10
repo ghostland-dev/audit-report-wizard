@@ -1,18 +1,21 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Save, FileCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import AuditForm, { AuditData } from "@/components/AuditForm";
 import ReportPreview from "@/components/ReportPreview";
 import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const CreateAuditPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<Partial<AuditData>>({});
+  const [activeTab, setActiveTab] = useState<string>("edit");
 
   const handleSubmit = async (data: AuditData) => {
     setIsSubmitting(true);
@@ -41,8 +44,42 @@ const CreateAuditPage = () => {
     }
   };
 
+  const handleSaveDraft = async () => {
+    if (!formData.title || !formData.client) {
+      toast({
+        title: "Informations manquantes",
+        description: "Veuillez ajouter au moins un titre et un client pour enregistrer un brouillon.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Simulate API call to save draft
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      toast({
+        title: "Brouillon enregistré",
+        description: "Votre brouillon a été enregistré avec succès.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur lors de l'enregistrement",
+        description: "Une erreur est survenue lors de l'enregistrement du brouillon.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleFormChange = (data: Partial<AuditData>) => {
     setFormData(data);
+  };
+
+  const togglePreview = () => {
+    setActiveTab(activeTab === "edit" ? "preview" : "edit");
   };
 
   return (
@@ -60,23 +97,59 @@ const CreateAuditPage = () => {
             </Button>
             <h1 className="text-2xl font-bold">Créer un nouvel audit</h1>
           </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleSaveDraft}
+              disabled={isSubmitting || (!formData.title && !formData.client)}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Enregistrer le brouillon
+            </Button>
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <AuditForm 
-              onSubmit={handleSubmit} 
-              isEditing={false}
-              onChange={handleFormChange}
-            />
-          </div>
-          <div className="lg:col-span-1">
-            <ReportPreview 
-              auditData={formData} 
-              loading={isSubmitting}
-            />
-          </div>
-        </div>
+        <Card className="mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle>Nouvel audit</CardTitle>
+            <CardDescription>
+              Complétez le formulaire ci-dessous pour créer un nouvel audit. Vous pouvez prévisualiser le rapport à tout moment.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="edit">Éditer</TabsTrigger>
+                <TabsTrigger value="preview">Prévisualiser</TabsTrigger>
+              </TabsList>
+              <TabsContent value="edit" className="mt-0">
+                <AuditForm 
+                  onSubmit={handleSubmit} 
+                  isEditing={false}
+                  onChange={handleFormChange}
+                />
+              </TabsContent>
+              <TabsContent value="preview" className="mt-0">
+                <div className="flex justify-center">
+                  <div className="w-full max-w-4xl">
+                    <ReportPreview 
+                      auditData={formData} 
+                      loading={isSubmitting}
+                    />
+                    <div className="mt-6 flex justify-center">
+                      <Button 
+                        onClick={() => setActiveTab("edit")}
+                        variant="outline"
+                      >
+                        Retourner à l'édition
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );
