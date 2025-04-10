@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle, FileText, Info, Users, Server, Database, ShieldCheck, BarChart, FileQuestion } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,21 +30,49 @@ const reportSections = [
   { id: "kpi", title: "Indicateurs de validation et dashboard", icon: BarChart, required: false },
 ];
 
-const AuditForm = () => {
+// Interface for the props
+interface AuditFormProps {
+  initialData?: any;
+  onSubmit?: (formData: any) => void;
+  isEditing?: boolean;
+}
+
+const AuditForm = ({ initialData, onSubmit, isEditing = false }: AuditFormProps = {}) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
   const [formData, setFormData] = useState({
-    title: "",
-    client: "",
-    contactName: "",
-    contactEmail: "",
-    sector: "",
-    auditType: "",
-    employeeCount: "",
-    description: "",
-    selectedSections: reportSections.filter(section => section.required).map(section => section.id),
+    title: initialData?.title || "",
+    client: initialData?.client || "",
+    contactName: initialData?.contactName || "",
+    contactEmail: initialData?.contactEmail || "",
+    sector: initialData?.sector || "",
+    auditType: initialData?.auditType || "",
+    employeeCount: initialData?.employeeCount || "",
+    description: initialData?.description || "",
+    selectedSections: initialData?.sections 
+      ? initialData.sections.map((section: any) => section.id)
+      : reportSections.filter(section => section.required).map(section => section.id),
   });
+
+  // Update form data if initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        title: initialData.title || "",
+        client: initialData.client || "",
+        contactName: initialData.contactName || "",
+        contactEmail: initialData.contactEmail || "",
+        sector: initialData.sector || "",
+        auditType: initialData.auditType || "",
+        employeeCount: initialData.employeeCount || "",
+        description: initialData.description || "",
+        selectedSections: initialData.sections 
+          ? initialData.sections.map((section: any) => section.id)
+          : reportSections.filter(section => section.required).map(section => section.id),
+      });
+    }
+  }, [initialData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -94,7 +122,13 @@ const AuditForm = () => {
       return;
     }
     
-    // Here, you would typically save the audit to your backend
+    // If custom onSubmit is provided, use it
+    if (onSubmit) {
+      onSubmit(formData);
+      return;
+    }
+    
+    // Default behavior for creating a new audit
     console.log("Audit form submitted:", formData);
     
     // Show success message
@@ -113,9 +147,11 @@ const AuditForm = () => {
     <form onSubmit={handleSubmit} className="space-y-8">
       <Card>
         <CardHeader>
-          <CardTitle>Informations générales</CardTitle>
+          <CardTitle>{isEditing ? "Modifier l'audit" : "Informations générales"}</CardTitle>
           <CardDescription>
-            Renseignez les informations de base concernant votre audit.
+            {isEditing 
+              ? "Modifiez les informations de base concernant votre audit."
+              : "Renseignez les informations de base concernant votre audit."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -171,7 +207,11 @@ const AuditForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="sector">Secteur d'activité</Label>
-              <Select name="sector" onValueChange={(value) => handleSelectChange("sector", value)}>
+              <Select 
+                name="sector" 
+                value={formData.sector}
+                onValueChange={(value) => handleSelectChange("sector", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner un secteur" />
                 </SelectTrigger>
@@ -191,6 +231,7 @@ const AuditForm = () => {
               <Label htmlFor="auditType">Type d'audit <span className="text-red-500">*</span></Label>
               <Select 
                 name="auditType" 
+                value={formData.auditType}
                 onValueChange={(value) => handleSelectChange("auditType", value)}
                 required
               >
@@ -274,11 +315,15 @@ const AuditForm = () => {
       </Card>
 
       <div className="flex justify-end gap-4">
-        <Button variant="outline" type="button" onClick={() => navigate("/dashboard")}>
-          Annuler
+        <Button 
+          variant="outline" 
+          type="button" 
+          onClick={() => navigate(isEditing ? `/audits/${initialData?.id}` : "/dashboard")}
+        >
+          {isEditing ? "Annuler" : "Annuler"}
         </Button>
         <Button type="submit" className="bg-audit-blue-600 hover:bg-audit-blue-700">
-          Créer l'audit
+          {isEditing ? "Enregistrer les modifications" : "Créer l'audit"}
         </Button>
       </div>
     </form>
