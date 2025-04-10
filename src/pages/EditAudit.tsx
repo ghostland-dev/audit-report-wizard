@@ -2,14 +2,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import AuditForm from "@/components/AuditForm";
+import AuditForm, { AuditData } from "@/components/AuditForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
 // Mock audit data (same as in AuditDetails.tsx)
-const mockAudit = {
+const mockAudit: AuditData = {
   id: 1,
   title: "Audit SI - Société ABC",
   client: "ABC Inc.",
@@ -46,7 +46,7 @@ const EditAudit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [audit, setAudit] = useState(mockAudit);
+  const [audit, setAudit] = useState<AuditData>(mockAudit);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -30,14 +30,34 @@ const reportSections = [
   { id: "kpi", title: "Indicateurs de validation et dashboard", icon: BarChart, required: false },
 ];
 
-// Interface for the props
-interface AuditFormProps {
-  initialData?: any;
+// Define a proper type for the audit data
+export interface AuditData {
+  id?: number;
+  title: string;
+  client: string;
+  contactName: string;
+  contactEmail: string;
+  sector: string;
+  auditType: string;
+  employeeCount: string;
+  description: string;
+  sections?: Array<{ id: string; title: string; progress: number }>;
+  createdAt?: string;
+  updatedAt?: string;
+  status?: string;
+  progress?: number;
+  findings?: Array<{ id: number; title: string; severity: string; area: string; description: string }>;
+  recommendations?: Array<{ id: number; title: string; priority: string; timeframe: string; description: string }>;
+}
+
+// Define the interface for the props
+export interface AuditFormProps {
+  initialData?: AuditData;
   onSubmit?: (formData: any) => void;
   isEditing?: boolean;
 }
 
-const AuditForm = ({ initialData, onSubmit, isEditing = false }: AuditFormProps = {}) => {
+const AuditForm = ({ initialData, onSubmit, isEditing = false }: AuditFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
