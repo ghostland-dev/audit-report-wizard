@@ -12,6 +12,7 @@ const CreateAuditPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState<Partial<AuditData>>({});
 
   const handleSubmit = async (data: AuditData) => {
     setIsSubmitting(true);
@@ -40,6 +41,10 @@ const CreateAuditPage = () => {
     }
   };
 
+  const handleFormChange = (data: Partial<AuditData>) => {
+    setFormData(data);
+  };
+
   return (
     <Layout>
       <div className="audit-container py-8">
@@ -62,10 +67,14 @@ const CreateAuditPage = () => {
             <AuditForm 
               onSubmit={handleSubmit} 
               isEditing={false}
+              onChange={handleFormChange}
             />
           </div>
           <div className="lg:col-span-1">
-            <ReportPreview />
+            <ReportPreview 
+              auditData={formData} 
+              loading={isSubmitting}
+            />
           </div>
         </div>
       </div>
