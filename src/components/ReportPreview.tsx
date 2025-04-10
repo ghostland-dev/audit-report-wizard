@@ -1,5 +1,5 @@
 
-import { FileText, Download, FileText2, Share2 } from "lucide-react";
+import { FileText, Download, FileX, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -166,7 +166,7 @@ const ReportPreview = ({ auditData, loading = false }: ReportPreviewProps) => {
               Exporter en PDF
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleExport('word')}>
-              <FileText2 className="h-4 w-4 mr-2" />
+              <FileX className="h-4 w-4 mr-2" />
               Exporter en Word
             </DropdownMenuItem>
           </DropdownMenuContent>

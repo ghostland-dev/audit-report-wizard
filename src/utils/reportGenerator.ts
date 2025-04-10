@@ -17,9 +17,10 @@ export const generateReportText = (auditData: AuditData): string => {
     report.push(`Période: ${auditData.startDate} au ${auditData.endDate}`);
   }
   
-  // Introduction
-  if (auditData.introduction) {
-    report.push(`\n## Introduction\n${auditData.introduction}`);
+  // We'll only add introduction if it exists in the data
+  // This is a temporary fix until we update the AuditData type
+  if ('introduction' in auditData && (auditData as any).introduction) {
+    report.push(`\n## Introduction\n${(auditData as any).introduction}`);
   }
   
   // Scope
@@ -42,9 +43,10 @@ export const generateReportText = (auditData: AuditData): string => {
     report.push(`\n## Recommandations\n${auditData.recommendations}`);
   }
   
-  // Conclusion
-  if (auditData.conclusion) {
-    report.push(`\n## Conclusion\n${auditData.conclusion}`);
+  // We'll only add conclusion if it exists in the data
+  // This is a temporary fix until we update the AuditData type
+  if ('conclusion' in auditData && (auditData as any).conclusion) {
+    report.push(`\n## Conclusion\n${(auditData as any).conclusion}`);
   }
   
   return report.join('\n');
