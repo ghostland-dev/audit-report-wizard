@@ -104,9 +104,41 @@ export const generateReportText = (auditData: AuditData): string => {
  * Creates a more formatted PDF structure with styling
  * In a real app, this would generate a proper PDF using a library
  */
-export const generateFormattedPDF = (auditData: AuditData): string => {
-  // This is a simulated PDF structure with some basic styling instructions
-  // In a real app, this would be replaced with actual PDF generation logic
+export const generateFormattedPDF = (auditData: AuditData, theme: 'standard' | 'modern' | 'minimal' = 'standard'): string => {
+  // Choose style based on theme
+  let styleContent = '';
+  
+  switch(theme) {
+    case 'modern':
+      styleContent = `
+        body { font-family: 'Segoe UI', Roboto, sans-serif; margin: 40px; color: #333; }
+        h1 { color: #2563eb; text-align: center; margin-bottom: 30px; font-weight: 300; }
+        h2 { color: #3b82f6; margin-top: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; font-weight: 400; }
+        .header-info { color: #6b7280; margin-bottom: 30px; text-align: center; }
+        .section { margin-bottom: 20px; padding: 15px; background-color: #f8fafc; border-radius: 8px; }
+        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #94a3b8; }
+      `;
+      break;
+    case 'minimal':
+      styleContent = `
+        body { font-family: 'Arial', sans-serif; margin: 40px; color: #333; line-height: 1.6; }
+        h1 { color: #000; text-align: center; margin-bottom: 30px; font-weight: normal; letter-spacing: 1px; }
+        h2 { color: #000; margin-top: 25px; border-bottom: 1px solid #eee; padding-bottom: 8px; font-weight: normal; }
+        .header-info { color: #666; margin-bottom: 30px; text-align: center; }
+        .section { margin-bottom: 20px; }
+        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #999; }
+      `;
+      break;
+    default: // standard
+      styleContent = `
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #1a56db; text-align: center; margin-bottom: 30px; }
+        h2 { color: #1e429f; margin-top: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+        .header-info { color: #4b5563; margin-bottom: 30px; text-align: center; }
+        .section { margin-bottom: 20px; }
+        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #6b7280; }
+      `;
+  }
   
   const pdfStructure = `
 <!DOCTYPE html>
@@ -114,12 +146,11 @@ export const generateFormattedPDF = (auditData: AuditData): string => {
 <head>
   <title>${auditData.title || "Rapport d'audit"}</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
-    h1 { color: #1a56db; text-align: center; margin-bottom: 30px; }
-    h2 { color: #1e429f; margin-top: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
-    .header-info { color: #4b5563; margin-bottom: 30px; text-align: center; }
-    .section { margin-bottom: 20px; }
-    .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #6b7280; }
+    ${styleContent}
+    @page { size: A4; margin: 2cm; }
+    @media print {
+      .page-break { page-break-before: always; }
+    }
   </style>
 </head>
 <body>
@@ -129,7 +160,32 @@ export const generateFormattedPDF = (auditData: AuditData): string => {
     <p><strong>Client:</strong> ${auditData.client || "Non spécifié"}</p>
     ${auditData.startDate && auditData.endDate ? 
       `<p><strong>Période:</strong> ${auditData.startDate} au ${auditData.endDate}</p>` : ''}
+    <p><strong>Date du rapport:</strong> ${new Date().toLocaleDateString('fr-FR')}</p>
   </div>
+  
+  <div class="table-of-contents">
+    <h2>Table des matières</h2>
+    <ul>
+      ${('introduction' in auditData && auditData.introduction) ? '<li>Introduction</li>' : ''}
+      ${('companyPresentation' in auditData && auditData.companyPresentation) ? '<li>Présentation générale de l\'entreprise</li>' : ''}
+      ${('technicalState' in auditData && auditData.technicalState) ? '<li>État des lieux de l\'organisation technique du SI</li>' : ''}
+      ${auditData.scope ? '<li>Périmètre de l\'audit</li>' : ''}
+      ${('dataFlowAnalysis' in auditData && auditData.dataFlowAnalysis) ? '<li>Analyse des flux de données</li>' : ''}
+      ${('constraints' in auditData && auditData.constraints) ? '<li>Contraintes et enjeux</li>' : ''}
+      ${auditData.methodology ? '<li>Méthodologie</li>' : ''}
+      ${('requirements' in auditData && auditData.requirements) ? '<li>Exigences fonctionnelles et non-fonctionnelles</li>' : ''}
+      ${auditData.findings ? '<li>Constatations principales</li>' : ''}
+      ${('auditSummary' in auditData && auditData.auditSummary) ? '<li>Synthèse de l\'audit</li>' : ''}
+      ${('targetArchitecture' in auditData && auditData.targetArchitecture) ? '<li>Conception de l\'architecture cible</li>' : ''}
+      ${auditData.recommendations ? '<li>Recommandations</li>' : ''}
+      ${('validationIndicators' in auditData && auditData.validationIndicators) ? '<li>Indicateurs de validation et dashboard de suivi</li>' : ''}
+      ${('strategicAdvice' in auditData && auditData.strategicAdvice) ? '<li>Conseils stratégiques pour les décideurs</li>' : ''}
+      ${('bibliography' in auditData && auditData.bibliography) ? '<li>Bibliographie / Webographie</li>' : ''}
+      ${('conclusion' in auditData && auditData.conclusion) ? '<li>Conclusion générale</li>' : ''}
+    </ul>
+  </div>
+
+  <div class="page-break"></div>
   
   ${'introduction' in auditData && auditData.introduction ? 
     `<div class="section">
@@ -228,7 +284,7 @@ export const generateFormattedPDF = (auditData: AuditData): string => {
     </div>` : ''}
   
   <div class="footer">
-    <p>Document généré le ${new Date().toLocaleDateString('fr-FR')}</p>
+    <p>Document généré le ${new Date().toLocaleDateString('fr-FR')} | ${auditData.client || "Client"} - ${auditData.title || "Rapport d'audit"}</p>
   </div>
 </body>
 </html>
@@ -241,8 +297,8 @@ export const generateFormattedPDF = (auditData: AuditData): string => {
  * In a real application, this would generate a PDF file using a library like pdfmake
  * For this demo, we'll simulate it by creating a downloadable HTML file styled to look like a PDF
  */
-export const downloadAsPDF = (auditData: AuditData) => {
-  const htmlContent = generateFormattedPDF(auditData);
+export const downloadAsPDF = (auditData: AuditData, theme: 'standard' | 'modern' | 'minimal' = 'standard') => {
+  const htmlContent = generateFormattedPDF(auditData, theme);
   const blob = new Blob([htmlContent], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -274,6 +330,26 @@ export const downloadAsWord = (auditData: AuditData) => {
 };
 
 /**
+ * Generates a printable version of the report
+ */
+export const printReport = (auditData: AuditData, theme: 'standard' | 'modern' | 'minimal' = 'standard') => {
+  const htmlContent = generateFormattedPDF(auditData, theme);
+  
+  // Create a new window for printing
+  const printWindow = window.open('', '_blank');
+  if (printWindow) {
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    
+    // Wait for resources to load before printing
+    printWindow.onload = () => {
+      printWindow.print();
+      // Don't close the window after printing so user can see the preview
+    };
+  }
+};
+
+/**
  * In a real application, this would generate and share a link to the report
  * For this demo, we'll just return a dummy link
  */
@@ -281,4 +357,20 @@ export const generateShareableLink = (auditData: AuditData): string => {
   // In a real application, this would create a unique link to the report
   const auditId = auditData.id || Math.floor(Math.random() * 10000);
   return `https://rapport-audit.example.com/share/${auditId}`;
+};
+
+/**
+ * Takes an auditData object and returns only the populated fields
+ * This is useful for minimizing data size when sharing
+ */
+export const sanitizeAuditData = (auditData: AuditData): Partial<AuditData> => {
+  const sanitized: Partial<AuditData> = {};
+  
+  Object.entries(auditData).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      sanitized[key as keyof AuditData] = value;
+    }
+  });
+  
+  return sanitized;
 };

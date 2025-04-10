@@ -1,15 +1,19 @@
 
-import { FileText, Download, FileX, Share2 } from "lucide-react";
+import { FileText, Download, FileX, Share2, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AuditData } from "@/components/AuditForm";
-import { downloadAsPDF, downloadAsWord, generateShareableLink } from "@/utils/reportGenerator";
+import { downloadAsPDF, downloadAsWord, generateShareableLink, printReport } from "@/utils/reportGenerator";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -32,6 +36,7 @@ const ReportPreview = ({ auditData, loading = false }: ReportPreviewProps) => {
   const { toast } = useToast();
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareLink, setShareLink] = useState("");
+  const [reportTheme, setReportTheme] = useState<'standard' | 'modern' | 'minimal'>('standard');
   
   const hasData = auditData && (
     auditData.title || 
@@ -51,10 +56,10 @@ const ReportPreview = ({ auditData, loading = false }: ReportPreviewProps) => {
     }
     
     if (format === 'pdf') {
-      downloadAsPDF(auditData as AuditData);
+      downloadAsPDF(auditData as AuditData, reportTheme);
       toast({
         title: "Rapport téléchargé",
-        description: "Le rapport a été téléchargé au format PDF (simulé)."
+        description: `Le rapport a été téléchargé au format PDF (simulé) avec le thème ${reportTheme}.`
       });
     } else {
       downloadAsWord(auditData as AuditData);
@@ -63,6 +68,23 @@ const ReportPreview = ({ auditData, loading = false }: ReportPreviewProps) => {
         description: "Le rapport a été téléchargé au format Word (simulé)."
       });
     }
+  };
+  
+  const handlePrint = () => {
+    if (!auditData) {
+      toast({
+        title: "Impossible d'imprimer",
+        description: "Veuillez d'abord compléter les informations de l'audit.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    printReport(auditData as AuditData, reportTheme);
+    toast({
+      title: "Impression lancée",
+      description: "La fenêtre d'impression a été ouverte."
+    });
   };
   
   const handleShare = () => {
@@ -197,7 +219,9 @@ const ReportPreview = ({ auditData, loading = false }: ReportPreviewProps) => {
               Télécharger
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel>Format</DropdownMenuLabel>
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleExport('pdf')}>
               <FileText className="h-4 w-4 mr-2" />
               Exporter en PDF
@@ -206,8 +230,25 @@ const ReportPreview = ({ auditData, loading = false }: ReportPreviewProps) => {
               <FileX className="h-4 w-4 mr-2" />
               Exporter en Word
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel>Style du rapport</DropdownMenuLabel>
+            <DropdownMenuRadioGroup value={reportTheme} onValueChange={(value) => setReportTheme(value as 'standard' | 'modern' | 'minimal')}>
+              <DropdownMenuRadioItem value="standard">Standard</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="modern">Moderne</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="minimal">Minimaliste</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
+        
+        <Button 
+          disabled={!hasData} 
+          variant="outline" 
+          onClick={handlePrint}
+          className="w-full sm:w-auto gap-2"
+        >
+          <Printer className="h-4 w-4" />
+          Imprimer
+        </Button>
         
         <Button 
           disabled={!hasData} 
