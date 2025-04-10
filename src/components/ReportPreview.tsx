@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AuditData } from "@/components/AuditForm";
-import { downloadAsPDF, downloadAsWord } from "@/utils/reportGenerator";
+import { downloadAsPDF, downloadAsWord, generateShareableLink } from "@/utils/reportGenerator";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 interface ReportPreviewProps {
   auditData?: Partial<AuditData>;
@@ -20,6 +30,8 @@ interface ReportPreviewProps {
 
 const ReportPreview = ({ auditData, loading = false }: ReportPreviewProps) => {
   const { toast } = useToast();
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareLink, setShareLink] = useState("");
   
   const hasData = auditData && (
     auditData.title || 
@@ -54,9 +66,34 @@ const ReportPreview = ({ auditData, loading = false }: ReportPreviewProps) => {
   };
   
   const handleShare = () => {
-    toast({
-      title: "Fonctionnalité à venir",
-      description: "Le partage de rapports sera disponible dans une prochaine mise à jour."
+    if (!auditData) {
+      toast({
+        title: "Impossible de partager",
+        description: "Veuillez d'abord compléter les informations de l'audit.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Generate a shareable link
+    const link = generateShareableLink(auditData as AuditData);
+    setShareLink(link);
+    setShareDialogOpen(true);
+  };
+  
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shareLink).then(() => {
+      toast({
+        title: "Lien copié",
+        description: "Le lien de partage a été copié dans le presse-papier."
+      });
+      setShareDialogOpen(false);
+    }).catch(() => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de copier le lien. Veuillez réessayer.",
+        variant: "destructive"
+      });
     });
   };
 
@@ -181,6 +218,33 @@ const ReportPreview = ({ auditData, loading = false }: ReportPreviewProps) => {
           <Share2 className="h-4 w-4" />
           Partager
         </Button>
+        
+        <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Partager le rapport</DialogTitle>
+              <DialogDescription>
+                Utilisez ce lien pour partager le rapport avec d'autres personnes.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Input
+                value={shareLink}
+                readOnly
+                className="w-full"
+                onClick={(e) => (e.target as HTMLInputElement).select()}
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShareDialogOpen(false)}>
+                Annuler
+              </Button>
+              <Button onClick={copyToClipboard}>
+                Copier le lien
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardFooter>
     </Card>
   );
