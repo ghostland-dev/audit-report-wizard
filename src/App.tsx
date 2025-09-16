@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +9,12 @@ import CreateAudit from "./pages/CreateAudit";
 import AuditDetails from "./pages/AuditDetails";
 import EditAudit from "./pages/EditAudit";
 import Settings from "./pages/Settings";
+import Templates from "./pages/Templates";
+import Analytics from "./pages/Analytics";
+import TeamManagement from "./pages/TeamManagement";
+import Calendar from "./pages/Calendar";
+import Library from "./pages/Library";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +31,12 @@ const App = () => (
           <Route path="/create-audit" element={<CreateAudit />} />
           <Route path="/audits/:id" element={<AuditDetails />} />
           <Route path="/audits/:id/edit" element={<EditAudit />} />
+          <Route path="/templates" element={<Templates />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/team" element={<TeamManagement />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/library" element={<Library />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

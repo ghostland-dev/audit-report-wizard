@@ -9,7 +9,10 @@ import {
   Menu,
   X,
   LogOut,
-  User
+  User,
+  BarChart3,
+  Users,
+  Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +41,10 @@ const Navigation = () => {
     { path: "/", label: "Accueil", icon: Home },
     { path: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
     { path: "/create-audit", label: "Nouvel audit", icon: FileText },
+    { path: "/templates", label: "Templates", icon: FileText },
+    { path: "/analytics", label: "Analytics", icon: BarChart3 },
+    { path: "/team", label: "Équipe", icon: Users },
+    { path: "/calendar", label: "Calendrier", icon: Calendar },
   ];
 
   return (
