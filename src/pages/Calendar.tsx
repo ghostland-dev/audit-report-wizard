@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Layout from "@/components/Layout";
+import EventDialog from "@/components/EventDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -75,23 +76,25 @@ const mockEvents: AuditEvent[] = [
 ];
 
 const eventTypeConfig = {
-  audit: { label: "Audit", color: "bg-blue-100 text-blue-800", icon: CalendarIcon },
-  meeting: { label: "Réunion", color: "bg-green-100 text-green-800", icon: Users },
-  deadline: { label: "Échéance", color: "bg-red-100 text-red-800", icon: AlertCircle },
-  review: { label: "Révision", color: "bg-purple-100 text-purple-800", icon: CheckCircle2 }
+  audit: { label: "Audit", color: "bg-event-audit text-event-audit-foreground", icon: CalendarIcon },
+  meeting: { label: "Réunion", color: "bg-event-meeting text-event-meeting-foreground", icon: Users },
+  deadline: { label: "Échéance", color: "bg-event-deadline text-event-deadline-foreground", icon: AlertCircle },
+  review: { label: "Révision", color: "bg-event-review text-event-review-foreground", icon: CheckCircle2 }
 };
 
 const statusConfig = {
-  scheduled: { label: "Planifié", color: "bg-gray-100 text-gray-800" },
-  "in-progress": { label: "En cours", color: "bg-amber-100 text-amber-800" },
-  completed: { label: "Terminé", color: "bg-green-100 text-green-800" },
-  cancelled: { label: "Annulé", color: "bg-red-100 text-red-800" }
+  scheduled: { label: "Planifié", color: "bg-status-scheduled text-status-scheduled-foreground" },
+  "in-progress": { label: "En cours", color: "bg-status-in-progress text-status-in-progress-foreground" },
+  completed: { label: "Terminé", color: "bg-status-completed text-status-completed-foreground" },
+  cancelled: { label: "Annulé", color: "bg-status-cancelled text-status-cancelled-foreground" }
 };
 
 const CalendarPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<AuditEvent | null>(null);
   const [view, setView] = useState<'month' | 'week' | 'day'>('month');
+  const [showEventDialog, setShowEventDialog] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<AuditEvent | null>(null);
 
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
@@ -196,7 +199,10 @@ const CalendarPage = () => {
             <h1 className="text-3xl font-bold">Calendrier des audits</h1>
             <p className="text-muted-foreground">Planifiez et suivez vos audits et réunions</p>
           </div>
-          <Button className="bg-audit-blue-600 hover:bg-audit-blue-700">
+          <Button 
+            className="bg-audit-primary hover:bg-audit-primary/90 text-audit-primary-foreground"
+            onClick={() => setShowEventDialog(true)}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Nouvel événement
           </Button>
@@ -382,7 +388,15 @@ const CalendarPage = () => {
                 )}
                 
                 <div className="flex gap-2 pt-4">
-                  <Button size="sm" className="flex-1">
+                  <Button 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => {
+                      setEditingEvent(selectedEvent);
+                      setSelectedEvent(null);
+                      setShowEventDialog(true);
+                    }}
+                  >
                     Modifier
                   </Button>
                   <Button size="sm" variant="outline">
@@ -393,6 +407,20 @@ const CalendarPage = () => {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Event Creation/Edit Dialog */}
+        <EventDialog
+          open={showEventDialog}
+          onOpenChange={(open) => {
+            setShowEventDialog(open);
+            if (!open) setEditingEvent(null);
+          }}
+          event={editingEvent}
+          onSave={(event) => {
+            // In a real app, this would save to backend
+            console.log('Saving event:', event);
+          }}
+        />
       </div>
     </Layout>
   );

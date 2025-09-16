@@ -10,6 +10,7 @@ import AuditDetails from "./pages/AuditDetails";
 import EditAudit from "./pages/EditAudit";
 import Settings from "./pages/Settings";
 import Templates from "./pages/Templates";
+import TemplateEdit from "./pages/TemplateEdit";
 import Analytics from "./pages/Analytics";
 import TeamManagement from "./pages/TeamManagement";
 import Calendar from "./pages/Calendar";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/audits/:id" element={<AuditDetails />} />
           <Route path="/audits/:id/edit" element={<EditAudit />} />
           <Route path="/templates" element={<Templates />} />
+          <Route path="/templates/:id/edit" element={<TemplateEdit />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/team" element={<TeamManagement />} />
           <Route path="/calendar" element={<Calendar />} />

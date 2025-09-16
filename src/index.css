@@ -81,30 +81,33 @@
   @apply container px-4 mx-auto max-w-7xl;
 }
 
-/* Custom Colors */
+/* Semantic Design Tokens */
 :root {
-  --audit-blue-50: #eef5ff;
-  --audit-blue-100: #e0edff;
-  --audit-blue-200: #c7dfff;
-  --audit-blue-300: #a0caff;
-  --audit-blue-400: #72afff;
-  --audit-blue-500: #4a90ff;
-  --audit-blue-600: #2870f0;
-  --audit-blue-700: #205bdb;
-  --audit-blue-800: #1e48b2;
-  --audit-blue-900: #1e3f8e;
+  /* Event Types - Semantic tokens for calendar events */
+  --event-audit: 217 91% 60%;
+  --event-audit-foreground: 210 40% 98%;
+  --event-meeting: 142 76% 36%;
+  --event-meeting-foreground: 355.7 100% 97.3%;
+  --event-deadline: 0 84% 60%;
+  --event-deadline-foreground: 210 40% 98%;
+  --event-review: 262.1 83.3% 57.8%;
+  --event-review-foreground: 210 40% 98%;
   
-  --audit-gray-50: #f8fafc;
-  --audit-gray-100: #f1f5f9;
-  --audit-gray-200: #e2e8f0;
-  --audit-gray-300: #cbd5e1;
-  --audit-gray-400: #94a3b8;
-  --audit-gray-500: #64748b;
-  --audit-gray-600: #475569;
-  --audit-gray-700: #334155;
-  --audit-gray-800: #1e293b;
-  --audit-gray-900: #0f172a;
-  --audit-gray-950: #020617;
+  /* Status Tokens */
+  --status-scheduled: 215.4 16.3% 46.9%;
+  --status-scheduled-foreground: 210 40% 98%;
+  --status-in-progress: 45.4 93.4% 47.5%;
+  --status-in-progress-foreground: 26 83.3% 14.1%;
+  --status-completed: 142 76% 36%;
+  --status-completed-foreground: 355.7 100% 97.3%;
+  --status-cancelled: 0 84% 60%;
+  --status-cancelled-foreground: 210 40% 98%;
+  
+  /* Audit System Colors */
+  --audit-primary: 217 91% 60%;
+  --audit-primary-foreground: 210 40% 98%;
+  --audit-secondary: 210 40% 96.1%;
+  --audit-secondary-foreground: 222.2 47.4% 11.2%;
 }
 
 .bg-audit-blue-50 { background-color: var(--audit-blue-50); }

@@ -89,7 +89,47 @@ export default {
 						800: '#3d4552',
 						900: '#363e4a',
 						950: '#24292f',
+					},
+					primary: {
+						DEFAULT: 'hsl(var(--audit-primary))',
+						foreground: 'hsl(var(--audit-primary-foreground))'
+					},
+					secondary: {
+						DEFAULT: 'hsl(var(--audit-secondary))',
+						foreground: 'hsl(var(--audit-secondary-foreground))'
 					}
+				},
+				'event-audit': {
+					DEFAULT: 'hsl(var(--event-audit))',
+					foreground: 'hsl(var(--event-audit-foreground))'
+				},
+				'event-meeting': {
+					DEFAULT: 'hsl(var(--event-meeting))',
+					foreground: 'hsl(var(--event-meeting-foreground))'
+				},
+				'event-deadline': {
+					DEFAULT: 'hsl(var(--event-deadline))',
+					foreground: 'hsl(var(--event-deadline-foreground))'
+				},
+				'event-review': {
+					DEFAULT: 'hsl(var(--event-review))',
+					foreground: 'hsl(var(--event-review-foreground))'
+				},
+				'status-scheduled': {
+					DEFAULT: 'hsl(var(--status-scheduled))',
+					foreground: 'hsl(var(--status-scheduled-foreground))'
+				},
+				'status-in-progress': {
+					DEFAULT: 'hsl(var(--status-in-progress))',
+					foreground: 'hsl(var(--status-in-progress-foreground))'
+				},
+				'status-completed': {
+					DEFAULT: 'hsl(var(--status-completed))',
+					foreground: 'hsl(var(--status-completed-foreground))'
+				},
+				'status-cancelled': {
+					DEFAULT: 'hsl(var(--status-cancelled))',
+					foreground: 'hsl(var(--status-cancelled-foreground))'
 				}
 			},
 			borderRadius: {
